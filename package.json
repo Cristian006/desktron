@@ -1,0 +1,28 @@
+{
+  "name": "desktron",
+  "version": "0.1.0",
+  "description": "A cross-platform desktop application. Developing with GitHub's Electron framework.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cristian006/desktron.git"
+  },
+  "keywords": [
+    "electron",
+    "dektop",
+    "application",
+    "app"
+  ],
+  "author": "Cristian Ponce",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Cristian006/desktron/issues"
+  },
+  "homepage": "https://github.com/Cristian006/desktron#readme",
+  "devDependencies": {
+    "electron-prebuilt": "^1.2.2"
+  }
+}
