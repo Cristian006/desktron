@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css'>
+  </head>
+  <body>
+    <div class="toolbar">
+      <div class="title">Home</div>
+      <div class="windowButtons">
+        <div id="closeButton">X</div>
+        <div id="maxButton">&#x2610;</div>
+        <div id="minButton">_</div>
+      </div>
+    </div>
+    <div class="tabs"></div>
+    <div class="body">
+      <h1>Hello World!</h1>
+      We are using node <script>document.write(process.versions.node)</script>,
+      Chrome <script>document.write(process.versions.chrome)</script>,
+      and Electron <script>document.write(process.versions.electron)</script>.
+    </div>
+  </body>
+  <script>
+    require('./renderer.js')
+  </script>
+</html>

@@ -1,0 +1,48 @@
+@import url(http://fonts.googleapis.com/css?family=Comfortaa:400,700,300);
+
+svg{
+  width: 100px;
+  height: 100px;
+  margin: 20px;
+  display:inline-block;
+}
+
+h1{
+  text-align: center;
+  color: #e74c3c;
+  margin: 0 0 100px;
+  font-size: 34px;
+  font-weight: 100;
+  text-transform: uppercase;
+  background-color: darken(#e74c3c, 5);
+  padding: 20px 0;  
+}
+
+h1 b{
+  font-weight: 700;
+}
+
+/*follow me template*/
+.made-with-love{
+  margin-top: 20px;
+  padding: 10px;
+  font-size: 10px;
+  font-family: arial;
+  color: #424242;
+}
+
+.made-with-love i{
+    font-style: normal;
+    color: #F50057;
+    font-size: 14px;
+    position: relative;
+    top: 2px;
+  }
+.made-with-love a{
+color: #424242;
+text-decoration: none;
+}
+
+.made-with-love a:hover{
+    text-decoration: underline;
+}

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="css/spinner.css">
+  </head>
+  <body>
+    <div class="toolbar">
+      <div class="title">Apple MDR</div>
+      <div class="windowButtons">
+        <div id="closeButton" onclick="">X</div>
+        <div id="maxButton" onclick="">&#x2610;</div>
+        <div id="minButton" onclick="">_</div>
+      </div>
+    </div>
+    <div class="tabs">
+      <div class="title">IQor Technical Services</div>
+    </div>
+    <div class="body">
+      <section>
+        <img src="images/iqorLogo.jpg">
+      </section>
+      <svg id="loadingSpinner" style="display:none;" version="1.1" id="L3" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+        viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
+      <circle fill="none" stroke="#303030" stroke-width="4" cx="50" cy="50" r="44" style="opacity:0.5;"/>
+        <circle fill="#e74c3c" stroke="#e74c3c" stroke-width="3" cx="8" cy="54" r="6" >
+          <animateTransform
+            attributeName="transform"
+            dur="2s"
+            type="rotate"
+            from="0 50 48"
+            to="360 50 52"
+            repeatCount="indefinite" />
+        </circle>
+      </svg>
+      <section id="loginSection">
+          <input class="loginInput" placeholder="Apple ID" type="text" name="user">
+          <input class="loginInput" placeholder="Password" type="password" name="password">
+          <button id="loginButton">Log In</button>
+      </section>
+      <section class="bottomSection">
+        <p>For use with Apple's GSX System</p>
+        We are using node <script>document.write(process.versions.node)</script>,
+        Chrome <script>document.write(process.versions.chrome)</script>,
+        and Electron <script>document.write(process.versions.electron)</script>.
+        <!-- follow me template -->
+        <div class="made-with-love">
+          Made with 
+          <i>♥</i> by 
+          <a target="_blank" href="#">Cristian Ponce</a>
+        </div>
+      </section>
+    </div>
+  </body>
+  <script>
+    require('./js/renderer.js')
+  </script>
+</html>
