@@ -5,45 +5,13 @@ const {app} = electron;
 const {BrowserWindow} = electron;
 // Module to create a native menu
 const {Menu} = electron;
-//Module to recieve calls from the renderer process
+//Module to receive calls from the renderer process
 const {ipcMain} = electron;//require('electron');
-
 // App Icon
 const appFavIcon = "app/images/lightbulb/lightbulb.png"
-
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win;
-
-function createWindow() {
-  // Create the browser window.
-
-  win = new BrowserWindow({
-    width: 800, 
-    height: 600, 
-    'minHeight': 600, 
-    'minWidth': 800, 
-    title: "Desktron", 
-    backgroundColor: "#EEEEEE", 
-    icon: appFavIcon, 
-    frame: false
-  });
-  
-
-  // and load the index.html of the app.
-  win.loadURL(`file://${__dirname}/app/index.html`);
-
-  // Open the DevTools.
-  win.webContents.openDevTools();
-
-  // Emitted when the window is closed.
-  win.on('closed', () => {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    win = null;
-  });
-}
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -67,44 +35,139 @@ app.on('activate', () => {
   }
 });
 
+function createWindow() {
+  // Create the browser window.
+  win = new BrowserWindow({
+    width: 800, 
+    height: 600, 
+    'minHeight': 600, 
+    'minWidth': 800, 
+    title: "Desktron", 
+    backgroundColor: "#EEEEEE", 
+    icon: appFavIcon, 
+    frame: false
+  });
+  
+  // and load the index.html of the app.
+  win.loadURL(`file://${__dirname}/app/index.html`);
+
+  // Open the DevTools.
+  //win.webContents.openDevTools();
+
+
+  // Emitted when the window is closed.
+  win.on('closed', () => {
+    // Dereference the window object, usually you would store windows
+    // in an array if your app supports multi windows, this is the time
+    // when you should delete the corresponding element.
+    win = null;
+  });
+}
+
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+class Person {
+  Person(name){
+    this.name = name;
+    this.phones = [];
+    this.clockInTime = new Date();
+    this.clockOutTime;
+    this.position = "";
+  }
+}
+Person.prototype.Person = function(){
+  var i, 
+      totalTime=0;
+  for (i=0; i < phones.length; i++){
+    totalTime += phones[i].timeStarted - phones[i].timeEnded;
+  }
+  return totalTime/(phones.length);
+}
+
+class Phone{
+  Phone(dispatch){
+    this.dispatch = dispatch;
+    this.serial = 0;
+    this.timeStarted = new Date();
+    this.timeEnded;
+    this.repairTech = "";
+  }
+}
+Phone.prototype.Repaired = function(repairTech, timeEnded){
+  this.repairTech = repairTech;
+  this.timeEnded = timeEnded;
+}
+
 const webdriver = require('selenium-webdriver'),
     By = require('selenium-webdriver').By,
     until = require('selenium-webdriver').until;
-
 const chrome = require('selenium-webdriver/chrome');
 const path = require('chromedriver').path;
-const service = new chrome.ServiceBuilder(path).build(); 
+const service = new chrome.ServiceBuilder(path).build();
+
+var mainDriver = null;
+var loggedIn = false;
+var user = '';
+var clockedInTime;
+
 chrome.setDefaultService(service);
 
-ipcMain.on('GSX-Login-Message', (event, arg) => {
+//GSX LOGIN
+ipcMain.on('GSX-Login-Message', (event, name, pass) => {
   console.log("logging in the main process");
-  driver = new webdriver.Builder().withCapabilities(webdriver.Capabilities.chrome()).build();
-  driver.get('https://gsx.apple.com/');
-  driver.getTitle().then(function(title) {
+  mainDriver = new webdriver.Builder().withCapabilities(webdriver.Capabilities.chrome()).build();
+  mainDriver.get('https://gsx.apple.com/');
+  var re = /@(iqor)*\.(com)|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})(:[0-9]{1,5})?$/;
+  if (name.search(re) == -1)
+  {
+    user = name.replace(".", " ");
+    name += "@iqor.com";
+  }
+  else{
+    user = name.replace(".", " ");
+    user = user.replace("@iqor.com", "");
+  }
+  user = TitleCase(user);
+  console.log(user);
+
+  mainDriver.getTitle().then(function(title) {
     console.log(title);
     if(title.includes("Login")){
         //USERNAME
-        var inputElementForUserID = driver.findElement(By.name('appleId'));
-        inputElementForUserID.sendKeys('cristian.ponce@iqor.com');
-        
+        var inputElementForUserID = mainDriver.findElement(By.name('appleId'));
+        inputElementForUserID.sendKeys(name);
         //PASSWORD
-        var inputElementForUserPass = driver.findElement(By.name('accountPassword'));
-        inputElementForUserPass.sendKeys('Ramonponce_97');
-        
+        var inputElementForUserPass = mainDriver.findElement(By.name('accountPassword'));
+        inputElementForUserPass.sendKeys(pass);
         inputElementForUserPass.submit();
     }
   });
-  driver.getTitle().then(function(title) {
-    event.sender.send('GSX-Login-Reply', 'REPLY');
-    console.log(title);
-  });
 
-  driver.sleep(3000);
-  console.log("before quit");
-  driver.quit();
-  win.reload(true);
-  event.sender.send('GSX-Login-Reply', 'REPLY');
-  
+  mainDriver.getTitle().then(function(title) {
+    if(title.includes("My Apple ID")){
+      //we logged in
+      loggedIn = true;
+      clockedInTime = new Date();
+      event.sender.send('GSX-Login-Reply', user);
+      //win.loadURL(`file://${__dirname}/app/home.html`); // and load the index.html of the app.
+    }
+    else if (title.includes("Login")){
+      event.sender.send('GSX-Login-Reply', 'false');
+      console.log("WE DID NOT LOG IN" + title);
+    }
+  });
 });
+
+var checkForPopUpTimer = setInterval(checkForClosingPopUp, 180000);
+
+function checkForClosingPopUp(){
+  console.log("CHECKING FOR POPUP");
+  if(loggedIn){
+    //check for logout pop up
+  }
+}
+
+function TitleCase(str){
+  //cristian ponce -> Cristian Ponce
+  return str.replace(/(^|\s)[a-z]/g,function(f){return f.toUpperCase();});
+}

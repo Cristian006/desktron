@@ -2,27 +2,116 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="css/base.css">
+    <link rel="stylesheet" type="text/css" href="css/home.css">
     <link href='https://fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css'>
   </head>
   <body>
-    <div class="toolbar">
-      <div class="title">Home</div>
+    <nav class="navbar">
+      <ul class="navbar-items">
+        <li class="nav-item" role="presentation">
+          <a href="#" class="nav-icon home active" role="button" onclick="openTabPage(event, 'home')"></a>
+        </li>
+        <li class="nav-item" role="presentation">
+          <a href="#" class="nav-icon rt" role="button" onclick="openTabPage(event, 'repair')"></a>
+        </li>
+        <li class="nav-item" role="presentation">
+          <a href="#" class="nav-icon qa" role="button" onclick="openTabPage(event, 'quality')"></a>
+        </li>
+        <li class="nav-item" role="presentation">
+          <a href="#" class="nav-icon settings" role="button" onclick="openTabPage(event, 'settings')"></a>
+        </li>
+      </ul>
+    </nav>
+    <div id="mainToolBar" class="toolbar">
+      <div id="toolBarTitle" class="title">Home</div>
       <div class="windowButtons">
         <div id="closeButton">X</div>
         <div id="maxButton">&#x2610;</div>
-        <div id="minButton">_</div>
+        <div id="minButton" onclick="min">_</div>
       </div>
     </div>
-    <div class="tabs"></div>
-    <div class="body">
-      <h1>Hello World!</h1>
-      We are using node <script>document.write(process.versions.node)</script>,
-      Chrome <script>document.write(process.versions.chrome)</script>,
-      and Electron <script>document.write(process.versions.electron)</script>.
+    <div id="mainTabBar" class="tabs">
+      <div id="tabBarTitle" class="title">IQor Technical Services</div>
     </div>
+    <div class="container">
+      <!-- HOME --------------------------------------------------------------------->
+      <div id="home" class="tab-content">
+        <div id="intro-card" class="card">
+          <img src="images/iqorLogo.jpg">
+          We are using node <script>document.write(process.versions.node)</script>,
+          Chrome <script>document.write(process.versions.chrome)</script>,
+          and Electron <script>document.write(process.versions.electron)</script>.
+        </div>
+        <div class="card">
+          <h1><img src="images/svgs/face_black.svg"> Cristian Ponce</h1>
+          <h4>Clocked In: 1:37 PM</h4>
+          Lunch
+          <h4>Clock Out: 3:45 PM</h4>
+        </div>
+        <div class="card">
+          <h1><img src="images/svgs/build/build_black.svg"> Repair Tech</h1>
+          <p>Click on the <img height="12px;" src="images/svgs/build/build_black.svg"> button 
+          in the navigation bar on the left</p>
+          <p>Once you scan the phone's <b>Dispatch Number</b> and click <b>Start Repair</b>, 
+          the timer for the tech's efficiency will start</p>
+          <p>repair the phone and when done, fill in the options provided and click 
+          <b>End Repair</b> to complete the GSX process for the basic process</p>
+          <p>Your efficency score for that phone will be saved and the program will complete
+          GSX with the options provided</p>
+        </div>
+        <div class="card">
+          <h1><img src="images/svgs/computer/computer_black.svg"> Quality Assurance</h1>
+          <p>Click on the <img height="12px" src="images/svgs/computer/computer_black.svg"> button 
+          in the navigation bar on the left</p>
+          <p>For now the <b>QA</b> tab will be more informational than anything</p>
+        </div>
+      </div>
+      <!-- REPAIR TECH --------------------------------------------------------------->
+      <div id="repair" class="tab-content" style="display:none;">
+        <div class="card">
+          <h1><img src="images/svgs/build/build_black.svg">Repair Phone</h1>
+          <input type="text" placeholder="IPhone GSX Number">
+          <button id="startRepair">Start Repair</button>
+        </div>
+        <div style="display:none;" class="card">
+          <h1><img src="images/svgs/iphone/iphone_black.svg">R10021032</h1>
+          <section id="note"><img style="vertical-align:top" src="images/svgs/note/note_black.svg"> <textarea placeholder="Note"></textarea></section>         
+          <button id="startRepair">End Repair</button>
+        </div>
+        <div class="timer-card">
+          <img style="vertical-align: middle" src="images/svgs/timer_white.svg">
+          <span>00:00:00</span>
+        </div>
+      </div>
+      <!-- QUALITY ASSURANCE ---------------------------------------------------------->
+      <div id="quality" class="tab-content" style="display:none;">
+        <div class="card">
+          <h1><img src="images/svgs/iphone/iphone_black.svg">QA</h1>
+        </div>
+      </div>
+      <!-- SETTINGS ------------------------------------------------------------------->
+      <div id="settings" class="tab-content" style="display:none;">
+        <div class="card">
+          <h1><img src="images/svgs/iphone/iphone_black.svg">Settings</h1>
+        </div>
+      </div>
+    </div>
+    <footer id="mainFooter" class="clearfix">
+      <ul>
+        <li class="left">
+          <img style="float: left;" src="images/svgs/iphone/iphone_white.svg">
+          <p style="float: left;">40</p>
+        </li>
+        <li class="left">
+          <img style="float: left;" src="images/svgs/face_white.svg">
+          <p style="float: left; margin-left: 5px;">Cristian Ponce</p>
+        </li>
+        <li class="right">
+          <a href="index.html" role="button">Log Out</a>
+        </li>
+      </ul>
+    </footer>
   </body>
-  <script>
-    require('./renderer.js')
-  </script>
+  <script src="./js/home.js"></script>
 </html>

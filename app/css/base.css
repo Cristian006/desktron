@@ -1,0 +1,241 @@
+html{
+    /*http://fonts.googleapis.com/css?family=Comfortaa:400,700,300 Comfortaa*/
+    font-family: 'Roboto Condensed', sans-serif;
+}
+
+.windowButtons{
+    float: right;
+    text-align: center;
+}
+
+.toolbar .windowButtons div{
+    cursor: pointer;
+}
+
+.toolbar .windowButtons div:hover{
+    background-color: #6c6c6c;
+}
+
+.clearfix{
+    clear: both;
+}
+
+.title{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    color: whitesmoke;
+    font-weight: bold;
+    text-shadow: 1px 1px #424242;
+}
+
+.toolbar .title{
+    font-size: 1.2em;
+}
+
+.tabs .title{
+    font-size: 1em;
+}
+
+.toolbar {
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    left: 0px;
+    height: 50px;
+    background-color: #303030;
+    -webkit-app-region: drag;
+    transition: background-color 0.1s ease-in;
+}
+
+.toolbar .windowButtons div {
+    -webkit-app-region: no-drag;
+    height: 32px;
+    width: 32px;
+    /*border: 1px solid #000;*/
+    float: right;
+    color: white;
+    /*top right bottom left*/
+    margin: 4px 4px 0 0;
+    line-height: 32px;
+}
+
+.tabs{
+    position: fixed;
+    top: 50px;
+    left: 0px;
+    right: 0px;
+    height:  50px;
+    background-color:  #303030;
+    box-shadow: 0px 5px 8px -1px rgba(0,0,0,0.2);
+    transition: background-color 0.1s ease;
+}
+
+.navbar{
+    width: 50px;
+    position: fixed;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    background-color: #6c6c6c;
+    box-shadow: inset -5px 0px 8px -1px rgba(0,0,0,0.2);
+}
+
+.navbar-items{
+    margin: 0 auto;
+    padding: 0;
+    width: 100%;
+}
+
+.nav-item{
+    display: block;
+    position: relative;
+    margin: 0;
+    cursor: pointer;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.nav-icon{
+    display: flex;
+    overflow: hidden;
+    height: 32px;
+    margin-right: 0;
+    padding: 0 0 0 50px;
+    box-sizing: border-box;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    opacity: .6;
+    font-size: 15px;
+    color: #fff;
+    text-shadow: 0 1px 0 rgba(0,0,0,.8);
+}
+
+.nav-icon.home{
+    background-image: url(../images/svgs/home_white.svg);
+}
+.nav-icon.rt{
+    background-image: url(../images/svgs/build/build_white.svg);
+}
+.nav-icon.qa{
+    background-image: url(../images/svgs/computer/computer_white.svg);
+}
+.nav-icon.settings{
+    background-image: url(../images/svgs/settings_white.svg);
+}
+
+.nav-icon:hover{
+    opacity: 1;
+}
+
+.nav-icon.active{
+    border-style: solid;
+    border-left-width: 5px;
+    border-left-color:  #FFFFFF;
+    border-bottom: 0px;
+    border-top: 0px;
+    border-right: 0px;
+    background-position: center;
+    opacity: 1;
+}
+
+button {
+  display: inline-block;
+  font-size: 20px;
+  margin: 10px;
+  height: 50px;
+  width: 250px;
+  margin-left: 75px;
+  background-color: transparent;
+  border-radius: 8px;
+  -moz-border-radius: 8px;
+  -webkit-border-radius: 8px;
+  color: #303030;
+  border: 2px solid #303030;
+  cursor: pointer;
+}
+
+button:focus{
+    outline: none;
+}
+
+button:hover {
+  border: 2px solid #303030;
+  color: #fff;
+  font-weight: bold;
+  outline: none;
+  background-color: #757575;
+} 
+
+footer{
+    box-shadow: 0px -5px 8px -1px rgba(0,0,0,0.2);
+    background-color: #F44336;
+    color: #fff;
+    height: 25px;
+    width: 100%; 
+    position: fixed; 
+    bottom: 0px; 
+    right: 0px; 
+    left: 0px;
+    transition: background-color 0.1s ease;
+}
+
+footer ul{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+footer li{
+    margin-left: 5px;
+    margin-right: 5px;
+    display: block;
+    height: 25px;
+}
+
+footer li a{
+    color: #fff;
+    text-decoration: none;
+    line-height: 25px;
+    padding-right: 5px;
+}
+
+footer li a:visited{
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+footer li.left{
+    float: left;
+}
+
+footer li.right{
+    float: right;
+}
+
+footer li img{
+    height: 20px;
+    margin-top: 3px;
+}
+
+footer li p{
+    line-height: 25px;
+    margin-top: 0px;
+}
+
+.card{
+    width: 400px;
+    margin: 0 auto;
+    margin-top: 10px;
+    background-color: #fff;
+    border-radius: 2px;
+    padding: 30px;
+}
+
+h1,h2,h3,h4,h5,h6{
+    padding: 0px;
+    margin: 0px;
+}
