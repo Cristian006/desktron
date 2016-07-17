@@ -86,12 +86,28 @@ Person.prototype.Efficiency = function(){
 }
 
 class Phone{
-  Phone(dispatch){
-    this.dispatch = dispatch;
-    this.serial = 0;
-    this.timeStarted = new Date();
-    this.timeEnded;
-    this.repairTech = "";
+  constructor(dispatchNumber){
+    this._dispatch = dispatchNumber;
+    this._serial = 0;
+    this._timeStarted = new Date();
+    this._timeEnded = 0;
+    this._repairTech = repairTech;
+  }
+  
+  getDispatch(){
+    return this._dispatch;
+  }
+  
+  getTimeStarted(){
+    return this._timeStarted;
+  }
+  
+  getTotalTime(){
+    return(this._timeStarted-this._timeEnded);
+  }
+  
+  repaired(){
+    this._timeEnded = new Date();
   }
 }
 
@@ -130,7 +146,6 @@ ipcMain.on('GSX-Login-Message', (event, name, pass) => {
     user = user.replace("@iqor.com", "");
   }
   user = TitleCase(user);
-  console.log(user);
 
   mainDriver.getTitle().then(function(title) {
     console.log(title);
@@ -160,10 +175,13 @@ ipcMain.on('GSX-Login-Message', (event, name, pass) => {
   });
 });
 
+//Send pin numbers to the modal dialog on gsx
 ipcMain.on('GSX-Pin-Message', (event, pinNumbers) => {
   mainDriver.findElements(By.className("digit-input")).then(elements => sendInPin(elements, pinNumbers));
 });
 
+
+//send in pin number to modal dialog to login
 function sendInPin(elements, numbers){
   var i;
   for (i=0; i < elements.length; i++){
@@ -185,6 +203,7 @@ function checkForClosingPopUp(){
   console.log("CHECKING FOR POPUP");
   if(loggedIn){
     //check for logout pop up
+    //if(mainDriver.findElement(By.id()));  
   }
 }
 
