@@ -5,7 +5,6 @@ const electron = require('electron');
 const remote = electron.remote;
 const {ipcRenderer} = electron;
 
-
 document.onreadystatechange = function () {
     if (document.readyState == "complete") {
         init(); 
@@ -13,8 +12,8 @@ document.onreadystatechange = function () {
 };
 
 ipcRenderer.on('GSX-Login-Reply', (event, arg) => {
-    console.log(arg); // prints "pong"
-    openPinDialog();
+    console.log(arg); // prints user name
+    openPinModal();
 });
 
 //WebPage Set Up
@@ -42,6 +41,10 @@ function init() {
 
     document.getElementById("loginButton").addEventListener("click", function(e){
         login();
+    });
+
+    document.getElementById("pinButton").addEventListener("click", function (e) {
+        sendKeysToPinModal();
     })
 };
 
@@ -54,11 +57,28 @@ function login() {
         console.log("logging in the renderer process");
         document.getElementById("loginSection").style.display = 'none';
         document.getElementById("loadingSpinner").style.display = 'block';
-        ipcRenderer.send('GSX-Login-Message', userName, userPass); // prints "pong"
+        ipcRenderer.send('GSX-Login-Message', userName, userPass);
     }
 }
 
-function openPinDialog(){
-    var dialog = document.getElementById("Pin-PopUp");
-    dialog.style.display = "block";
+function openPinModal(){
+    var modal = document.getElementById("myModal");
+    modal.style.display = "block";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+/*window.onclick = function(event) {
+    var modal = document.getElementById("myModal");
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}*/
+
+function sendKeysToPinModal(){
+    var i, numbers = [], pinElements = document.getElementsByClassName("pin-input");
+    for(i = 0; i < pinElements.length; i++){
+        numbers.push(pinElements[i].value);
+    }
+    console.log(numbers);
+    ipcRenderer.send('GSX-Pin-Message', numbers);
 }

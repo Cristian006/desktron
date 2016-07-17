@@ -23,7 +23,7 @@ function init() {
             window.maximize();
         } else {
             window.unmaximize();
-        }	 
+        }
     });
 
     document.getElementById("closeButton").addEventListener("click", function (e) {

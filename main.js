@@ -49,10 +49,10 @@ function createWindow() {
   });
   
   // and load the index.html of the app.
-  win.loadURL(`file://${__dirname}/app/index.html`);
+  win.loadURL(`file://${__dirname}/app/home.html`);
 
   // Open the DevTools.
-  //win.webContents.openDevTools();
+  win.webContents.openDevTools();
 
 
   // Emitted when the window is closed.
@@ -75,7 +75,8 @@ class Person {
     this.position = "";
   }
 }
-Person.prototype.Person = function(){
+
+Person.prototype.Efficiency = function(){
   var i, 
       totalTime=0;
   for (i=0; i < phones.length; i++){
@@ -93,6 +94,7 @@ class Phone{
     this.repairTech = "";
   }
 }
+
 Phone.prototype.Repaired = function(repairTech, timeEnded){
   this.repairTech = repairTech;
   this.timeEnded = timeEnded;
@@ -147,9 +149,9 @@ ipcMain.on('GSX-Login-Message', (event, name, pass) => {
     if(title.includes("My Apple ID")){
       //we logged in
       loggedIn = true;
-      clockedInTime = new Date();
+      mainDriver.findElement(By.id('send-code-to-trusted-device')).click();
+      mainDriver.findElement(By.name('rememberMeSelected')).click();
       event.sender.send('GSX-Login-Reply', user);
-      //win.loadURL(`file://${__dirname}/app/home.html`); // and load the index.html of the app.
     }
     else if (title.includes("Login")){
       event.sender.send('GSX-Login-Reply', 'false');
@@ -157,6 +159,25 @@ ipcMain.on('GSX-Login-Message', (event, name, pass) => {
     }
   });
 });
+
+ipcMain.on('GSX-Pin-Message', (event, pinNumbers) => {
+  mainDriver.findElements(By.className("digit-input")).then(elements => sendInPin(elements, pinNumbers));
+});
+
+function sendInPin(elements, numbers){
+  var i;
+  for (i=0; i < elements.length; i++){
+    elements[i].sendKeys(numbers[i]);
+    if(i==(elements.length-1)){
+      mainDriver.findElement(By.name('setupLink')).click();
+    }
+  }
+  // and load the index.html of the app.
+  win.loadURL(`file://${__dirname}/app/home.html`);
+  mainDriver.getTitle().then(function(title) {
+    console.log(title);
+  });
+}
 
 var checkForPopUpTimer = setInterval(checkForClosingPopUp, 180000);
 

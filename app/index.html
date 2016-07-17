@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -22,9 +23,22 @@
     <div class="container">
       <div id="myModal" class="modal">
           <div class="card modal-content">
-            <h2 style="text-align: center;">Enter the 4 numbers from the text message sent to your phone.</h2>
-            <input class="loginInput" type="text">
-            <button>Continue</button>
+            <h2>Verification</h2>
+            <h4>Enter the 4 digit verification code sent to your phone.</h4>
+              <div class="pin">
+                <input class="pin-input" type="text" maxlength=1 id="1" onkeyup="moveOnMax(this,'a')" />
+                <input class="pin-input" type="text" maxlength=1 id="a" onkeyup="moveOnMax(this,'b')" />
+                <input class="pin-input" type="text" maxlength=1 id="b" onkeyup="moveOnMax(this,'c')" />
+                <input class="pin-input" type="text" maxlength=1 id="c" />
+                  <script>                    
+                    moveOnMax = function (field, nextFieldID) {
+                        if (field.value.length == 1) {
+                            document.getElementById(nextFieldID).focus();
+                        }
+                    }
+                  </script>
+              </div>
+            <button id="pinButton">Continue</button>
           </div>
       </div>
       <div class="card">
@@ -65,7 +79,6 @@
         </section>
       </div>  
     </div>
-    
   </body>
   <script>
     require('./js/renderer.js');
