@@ -82,15 +82,27 @@ class Person {
 }
 
 class Phone{
-  constructor(dispatch){
-    this._dispatch = dispatch;
+  constructor(dispatchNumber){
+    this._dispatch = dispatchNumber;
     this._serial = 0;
     this._timeStarted = new Date();
-    this._timeEnded;
-    this._repairTech = user;
+    this._timeEnded = 0;
+    this._repairTech = repairTech;
   }
-
-  Repaired(){
+  
+  getDispatch(){
+    return this._dispatch;
+  }
+  
+  getTimeStarted(){
+    return this._timeStarted;
+  }
+  
+  getTotalTime(){
+    return(this._timeStarted-this._timeEnded);
+  }
+  
+  repaired(){
     this._timeEnded = new Date();
   }
 
@@ -159,10 +171,13 @@ ipcMain.on('GSX-Login-Message', (event, name, pass) => {
   });
 });
 
+//Send pin numbers to the modal dialog on gsx
 ipcMain.on('GSX-Pin-Message', (event, pinNumbers) => {
   mainDriver.findElements(By.className("digit-input")).then(elements => sendInPin(elements, pinNumbers));
 });
 
+
+//send in pin number to modal dialog to login
 function sendInPin(elements, numbers){
   var i;
   for (i=0; i < elements.length; i++){
@@ -207,6 +222,7 @@ function checkForClosingPopUp(){
   console.log("CHECKING FOR POPUP");
   if(loggedIn){
     //check for logout pop up
+    //if(mainDriver.findElement(By.id()));  
   }
 }
 
