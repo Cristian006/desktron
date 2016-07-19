@@ -66,13 +66,6 @@ function openPinModal(){
     modal.style.display = "block";
 }
 
-// When the user clicks anywhere outside of the modal, close it
-/*window.onclick = function(event) {
-    var modal = document.getElementById("myModal");
-    if (event.target == modal) {
-        modal.style.display = "none";
-    }
-}*/
 
 function sendKeysToPinModal(){
     var i, numbers = [], pinElements = document.getElementsByClassName("pin-input");

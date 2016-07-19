@@ -210,10 +210,12 @@ footer li a:visited{
 
 footer li.left{
     float: left;
+    margin-right: 10px;
 }
 
 footer li.right{
     float: right;
+    margin-left: 10px;
 }
 
 footer li img{

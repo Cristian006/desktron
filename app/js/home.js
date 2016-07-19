@@ -1,10 +1,14 @@
 const electron = require('electron');
 const remote = electron.remote;
 const {ipcRenderer} = electron;
+const moment = require('moment');
+const nedb = require('nedb');
+var db = new nedb({filename : __dirname + '/data/db.json', autoload: true});
+
+var USER = null;
 
 document.onreadystatechange = function () {
     if (document.readyState == "complete") {
-    console.log("IN IT - RENDER PROCESS asdlkfhals");
         init(); 
     }
 };
@@ -12,6 +16,13 @@ document.onreadystatechange = function () {
 //WebPage Set Up
 function init() {
     console.log("IN IT - HOME RENDERER PROCESS");
+    
+    db.find({}, function (err, docs){
+      console.log("FOUND DOC " + docs[0].userName);
+      USER = docs[0];
+      setUpHome();
+    });
+
     document.getElementById("minButton").addEventListener("click", function (e) {
         const window = remote.getCurrentWindow();
         window.minimize(); 
@@ -31,6 +42,14 @@ function init() {
         window.close();
     });    
 };
+
+function setUpHome(){
+    console.log("Setting up " + USER);
+    document.getElementById("WelcomeCardTitle").innerHTML = "<img src=\"images/svgs/face_black.svg\"> Welcome, " + USER.userName;
+    document.getElementById("clockTime").innerHTML = "<h4>Clocked In: " + USER.clockedInTime + "\n That is " + getTimeSinceClockedIn() +" </h4>";
+    document.getElementById("footerPhone").innerHTML = getNumberOfPhones();
+    document.getElementById("footerName").innerHTML = USER.userName;
+}
 
 function openTabPage(evt, contentID){
     var i, contents, tabLinks;
@@ -85,4 +104,42 @@ function changePageColor(primary, secondary) {
     toolBar.style.backgroundColor = primary;
     tabBar.style.backgroundColor = primary;
     footer.style.backgroundColor = primary;
+}
+
+
+function getNumberOfPhones(){
+    return USER.phones.length;
+}
+
+function getEfficiency() {
+    var i, totalTime=0;
+    for (i=0; i < USER.phones.length; i++){
+        totalTime += USER.phones[i].getTotalTime();
+    }
+    return totalTime/(USER.phones.length);
+}
+
+function getTimeSinceClockedIn(){
+    return timeConversion(new Date() - USER.clockedInTime);
+}
+
+
+function timeConversion(millisec) {
+    var seconds = (millisec / 1000).toFixed(1);
+
+    var minutes = (millisec / (1000 * 60)).toFixed(1);
+
+    var hours = (millisec / (1000 * 60 * 60)).toFixed(1);
+
+    var days = (millisec / (1000 * 60 * 60 * 24)).toFixed(1);
+
+    if (seconds < 60) {
+        return seconds + " Sec";
+    } else if (minutes < 60) {
+        return minutes + " Min";
+    } else if (hours < 24) {
+        return hours + " Hrs";
+    } else {
+        return days + " Days"
+    }
 }

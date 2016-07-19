@@ -13,6 +13,11 @@ const appFavIcon = "app/images/lightbulb/lightbulb.png"
 // be closed automatically when the JavaScript object is garbage collected.
 let win;
 
+const moment = require('moment');
+
+const nedb = require('nedb');
+var db = new nedb({filename : __dirname + '/app/data/db.json', autoload: true});
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -49,7 +54,7 @@ function createWindow() {
   });
   
   // and load the index.html of the app.
-  win.loadURL(`file://${__dirname}/app/home.html`);
+  win.loadURL(`file://${__dirname}/app/index.html`);
 
   // Open the DevTools.
   win.webContents.openDevTools();
@@ -67,37 +72,31 @@ function createWindow() {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 class Person {
-  Person(name){
-    this.name = name;
-    this.phones = [];
-    this.clockInTime = new Date();
-    this.clockOutTime;
-    this.position = "";
+  constructor(){
+    this._name = "";
+    this._phones = [];
+    this._clockInTime;
+    this._clockOutTime;
+    this._position = "";
   }
-}
-
-Person.prototype.Efficiency = function(){
-  var i, 
-      totalTime=0;
-  for (i=0; i < phones.length; i++){
-    totalTime += phones[i].timeStarted - phones[i].timeEnded;
-  }
-  return totalTime/(phones.length);
 }
 
 class Phone{
-  Phone(dispatch){
-    this.dispatch = dispatch;
-    this.serial = 0;
-    this.timeStarted = new Date();
-    this.timeEnded;
-    this.repairTech = "";
+  constructor(dispatch){
+    this._dispatch = dispatch;
+    this._serial = 0;
+    this._timeStarted = new Date();
+    this._timeEnded;
+    this._repairTech = user;
   }
-}
 
-Phone.prototype.Repaired = function(repairTech, timeEnded){
-  this.repairTech = repairTech;
-  this.timeEnded = timeEnded;
+  Repaired(){
+    this._timeEnded = new Date();
+  }
+
+  getTotalTime(){
+    return (this._timeStarted - this._timeEnded);
+  }
 }
 
 const webdriver = require('selenium-webdriver'),
@@ -110,7 +109,8 @@ const service = new chrome.ServiceBuilder(path).build();
 var mainDriver = null;
 var loggedIn = false;
 var user = '';
-var clockedInTime;
+
+var USER = new Person();
 
 chrome.setDefaultService(service);
 
@@ -130,7 +130,6 @@ ipcMain.on('GSX-Login-Message', (event, name, pass) => {
     user = user.replace("@iqor.com", "");
   }
   user = TitleCase(user);
-  console.log(user);
 
   mainDriver.getTitle().then(function(title) {
     console.log(title);
@@ -172,6 +171,29 @@ function sendInPin(elements, numbers){
       mainDriver.findElement(By.name('setupLink')).click();
     }
   }
+
+  var doc = {
+    userName : user,
+    clockedInTime : new Date(),
+    clockedOutTime : null,
+    phones : []
+  }
+
+  db.remove({}, { multi: true }, function (err, numRemoved) {
+    console.log("REMOVED " + numRemoved);
+  });
+
+  db.insert(doc, function (err, newDoc) {   
+    // Callback is optional
+    // newDoc is the newly inserted document, including its _id
+    // newDoc has no key called notToBeSaved since its value was undefined
+    console.log("NEW DOC " + newDoc.userName + " " + newDoc.phones.length);
+  });
+
+  db.find({}, function (err, docs){
+      console.log("FOUND DOC " + docs[0].userName);
+  });
+  
   // and load the index.html of the app.
   win.loadURL(`file://${__dirname}/app/home.html`);
   mainDriver.getTitle().then(function(title) {
