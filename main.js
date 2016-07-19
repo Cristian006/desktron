@@ -59,7 +59,6 @@ function createWindow() {
   // Open the DevTools.
   win.webContents.openDevTools();
 
-
   // Emitted when the window is closed.
   win.on('closed', () => {
     // Dereference the window object, usually you would store windows
@@ -71,16 +70,6 @@ function createWindow() {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
-class Person {
-  constructor(){
-    this._name = "";
-    this._phones = [];
-    this._clockInTime;
-    this._clockOutTime;
-    this._position = "";
-  }
-}
-
 class Phone{
   constructor(dispatchNumber){
     this._dispatch = dispatchNumber;
@@ -121,8 +110,6 @@ const service = new chrome.ServiceBuilder(path).build();
 var mainDriver = null;
 var loggedIn = false;
 var user = '';
-
-var USER = new Person();
 
 chrome.setDefaultService(service);
 

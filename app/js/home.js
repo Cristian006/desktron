@@ -40,13 +40,19 @@ function init() {
     document.getElementById("closeButton").addEventListener("click", function (e) {
         const window = remote.getCurrentWindow();
         window.close();
-    });    
+    });
+
+    document.getElementById("startRepair").addEventListener("click", function(e){
+        if(document.getElementById("phoneDispatch").value != ''){
+            repairPhone(document.getElementById("phoneDispatch").value);
+        }
+    });
 };
 
 function setUpHome(){
     console.log("Setting up " + USER);
     document.getElementById("WelcomeCardTitle").innerHTML = "<img src=\"images/svgs/face_black.svg\"> Welcome, " + USER.userName;
-    document.getElementById("clockTime").innerHTML = "<h4>Clocked In: " + USER.clockedInTime + "\n That is " + getTimeSinceClockedIn() +" </h4>";
+    document.getElementById("clockTime").innerHTML = "<h4>Clocked In: " + USER.clockedInTime + "</h4><h3>That is " + getTimeSinceClockedIn() +" ago.</h3>";
     document.getElementById("footerPhone").innerHTML = getNumberOfPhones();
     document.getElementById("footerName").innerHTML = USER.userName;
 }
@@ -105,6 +111,30 @@ function changePageColor(primary, secondary) {
     tabBar.style.backgroundColor = primary;
     footer.style.backgroundColor = primary;
 }
+
+//--------------------REPAIR---------------------------------------//
+function repairPhone(dis){
+    var phone = {
+        dispatch : dis,
+        serial : 1232342342,
+        startTime : new Date(),
+        endTime : null,
+        note : '',
+        repairedBy : USER.userName
+    }
+
+    USER.phones.push(phone);
+
+    db.update({ userName: USER.userName }, USER, {}, function (err, numReplaced) {
+        console.log("REPLACED " + numReplaced);
+    });
+
+    db.find({}, function (err, docs){
+        console.log("FOUND DOC " + docs[0].userName + "WITH " + docs[0].phones.length + " PHONES");
+        USER = docs[0];
+    });
+}
+//----------------------------------------------------------------//
 
 
 function getNumberOfPhones(){
