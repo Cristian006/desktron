@@ -5,6 +5,7 @@
     <link rel="stylesheet" type="text/css" href="css/base.css">
     <link rel="stylesheet" type="text/css" href="css/home.css">
     <link href='https://fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css'>
+    <script src="js/JsBarcode.all.min.js"></script>
   </head>
   <body>
     <nav class="navbar">
@@ -68,17 +69,113 @@
       <!-- REPAIR TECH --------------------------------------------------------------->
       <div id="repair" class="tab-content" style="display:none;">
         <div class="card">
-          <h1><img src="images/svgs/build/build_black.svg">Repair Phone</h1>
+          <section class="card-header">
+            <img class="title-icon" src="images/svgs/build/build_black.svg"> 
+            <p class="card-title">Repair Phone</p>
+          </section>
           <input id="phoneDispatch" type="text" placeholder="IPhone GSX Number">
           <button id="startRepair">Start Repair</button>
         </div>
-        <div style="display:none;" class="card">
-          <h1><img src="images/svgs/iphone/iphone_black.svg">R10021032</h1>
+        <div class="card">
+          <section class="card-header">
+            <img class="title-icon" src="images/svgs/iphone/iphone_rose.svg"> 
+            <p class="card-title">Iphone 6S Rose Gold</p>
+          </section>
+          <section class="dispatch">
+              <img class="icon" src="images/svgs/receipt_black.svg">
+              <div class="content">
+                <p>Dispatch Number</p>
+                <svg class="barcode"
+                  jsbarcode-format="CODE39"
+                  jsbarcode-value="123456789012"
+                  jsbarcode-textmargin="0"
+                  jsbarcode-height="30px"
+                  jsbarcode-width="1"
+                  jsbarcode-fontOptions="bold"
+                  jsbarcode-font="Roboto Condensed">
+                </svg>
+                <p>Serial Number</p> 
+                <svg class="barcode"
+                  jsbarcode-format="CODE39"
+                  jsbarcode-value="L14HJU45Y3298UHF"
+                  jsbarcode-textmargin="0"
+                  jsbarcode-height="30px"
+                  jsbarcode-width="1"
+                  jsbarcode-fontOptions="bold"
+                  jsbarcode-font="Roboto Condensed">
+              </div>
+          </section>
+          <section class="place">
+              <img class="icon" src="images/svgs/place_black.svg">
+              <div class="content">
+                <p>Palo Alto</p>
+              </div>
+          </section>
+          <section class="time">
+              <img class="icon" src="images/svgs/timer/timer_black.svg">
+              <div class="content">
+                <p>Repair Started: 1:50.9PM</p>
+                <p>Repair Ended: 5:30.5PM</p>
+                <p>Repair Time: 3'40''</p>
+              </div>
+          </section>
+          <section class="note">
+              <img class="icon" src="images/svgs/note/note_black.svg">
+              <div class="content">
+                <p>No Note</p>
+              </div>
+          </section>
+          <section class="screen">
+              <img class="icon" src="images/svgs/smartphone_black.svg">
+              <div class="content">
+                <p>Part Number</p>
+                <svg class="barcode"
+                  jsbarcode-format="CODE39"
+                  jsbarcode-value="661-00141"
+                  jsbarcode-textmargin="0"
+                  jsbarcode-height="30px"
+                  jsbarcode-width="1"
+                  jsbarcode-fontOptions="bold"
+                  jsbarcode-font="Roboto Condensed">
+                </svg>
+                <p>Serial Number</p> 
+                <svg class="barcode"
+                  jsbarcode-format="CODE39"
+                  jsbarcode-value="L14HJU45Y3298UHF"
+                  jsbarcode-textmargin="0"
+                  jsbarcode-height="30px"
+                  jsbarcode-width="1"
+                  jsbarcode-fontOptions="bold"
+                  jsbarcode-font="Roboto Condensed">
+                <p>Return Order Number</p> 
+                <svg class="barcode"
+                  jsbarcode-format="CODE39"
+                  jsbarcode-value="DSFJHWTYWIUEOFHIH29"
+                  jsbarcode-textmargin="0"
+                  jsbarcode-height="30px"
+                  jsbarcode-width="1"
+                  jsbarcode-fontOptions="bold"
+                  jsbarcode-font="Roboto Condensed">
+              </div>
+          </section>
+          <section class="screws">
+              <img class="icon" src="images/svgs/screwdriver_black.svg">
+              <div class="content">
+                <p>661-00141</p>
+                <p>661-00141</p>
+                <p>661-00141</p>
+                <p>661-00141</p>
+                <p>661-00141</p>
+              </div>
+          </section>
+        </div>
+        <div class="card">
+          <h2><img height="20px" src="images/svgs/iphone/iphone_rose.svg"> Iphone 6S RG - R10021032</h2>
           <section id="note"><img style="vertical-align:top" src="images/svgs/note/note_black.svg"> <textarea placeholder="Note"></textarea></section>         
           <button id="startRepair">End Repair</button>
         </div>
         <div class="timer-card">
-          <img style="vertical-align: middle" src="images/svgs/timer_white.svg">
+          <img style="vertical-align: middle" src="images/svgs/timer/timer_white.svg">
           <span>00:00:00</span>
         </div>
       </div>

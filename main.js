@@ -70,36 +70,6 @@ function createWindow() {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
-class Phone{
-  constructor(dispatchNumber){
-    this._dispatch = dispatchNumber;
-    this._serial = 0;
-    this._timeStarted = new Date();
-    this._timeEnded = 0;
-    this._repairTech = repairTech;
-  }
-  
-  getDispatch(){
-    return this._dispatch;
-  }
-  
-  getTimeStarted(){
-    return this._timeStarted;
-  }
-  
-  getTotalTime(){
-    return(this._timeStarted-this._timeEnded);
-  }
-  
-  repaired(){
-    this._timeEnded = new Date();
-  }
-
-  getTotalTime(){
-    return (this._timeStarted - this._timeEnded);
-  }
-}
-
 const webdriver = require('selenium-webdriver'),
     By = require('selenium-webdriver').By,
     until = require('selenium-webdriver').until;
@@ -163,8 +133,54 @@ ipcMain.on('GSX-Pin-Message', (event, pinNumbers) => {
   mainDriver.findElements(By.className("digit-input")).then(elements => sendInPin(elements, pinNumbers));
 });
 
+ipcMain.on('startRepair', (event, username, phoneDispatch) => {
+  var searchBar;
+  console.log("STARTING REPAIR " + phoneDispatch + " -----------------------------");
+  if(mainDriver.isElementPresent(By.id("global_search"))){
+    console.log("global_search is in the current page");
+      searchBar = mainDriver.findElement(By.id("global_search"));
+      console.log("is searchBar present " + searchBar == null + "This is searchBar " + searchBar);
+      searchBar.sendKeys(phoneDispatch);
+      searchBar.sendKeys(webdriver.Key.RETURN);
+  }
+  else if(mainDriver.isElementPresent(By.id("global_search"))){
+      searchBar = mainDriver.findElement(By.id("global_search"));
+      searchBar.sendKeys(phoneDispatch);
+      searchBar.sendKeys(webdriver.Key.RETURN);
+  }
+  else{
+    mainDriver.get('https://gsx.apple.com/');
+    mainDriver.wait(function () {
+        if(mainDriver.isElementPresent(By.id("search_GSX_input"))){
+          searchBar = mainDriver.findElement(By.id("search_GSX_input"));
+          searchBar.sendKeys(phoneDispatch);
+          searchBar.submit();
+        }
+    }, 3000);
+  }
+  /*mainDriver.wait(function () {
+    getPhoneInfo();
+  }, 3000)*/
+});
+
+//TODO: when logging in check to see if we can find a doc with their user name already in the database
+//if so use that one if not create a new one. so we can close the program re open it and it would save everything for the day
 
 //send in pin number to modal dialog to login
+function getPhoneInfo() {
+  var phoneModel; 
+  mainDriver.findElements(By.className("swappable-text model")).then(modelText => phoneModel = getPhoneModel(modelText[0]));
+  console.log("PHONE MoDEL " + phoneModel);
+}
+
+function getPhoneModel(div) {
+  var p;
+  div.getText().then(text => p = text);
+  console.log("THE MODEL OF THIS PHONE IS" + p);
+  return p;
+}
+
+
 function sendInPin(elements, numbers){
   var i;
   for (i=0; i < elements.length; i++){
@@ -174,7 +190,7 @@ function sendInPin(elements, numbers){
     }
   }
 
-  var doc = {
+  var newUser = {
     userName : user,
     clockedInTime : new Date(),
     clockedOutTime : null,
@@ -185,7 +201,7 @@ function sendInPin(elements, numbers){
     console.log("REMOVED " + numRemoved);
   });
 
-  db.insert(doc, function (err, newDoc) {   
+  db.insert(newUser, function (err, newDoc) {   
     // Callback is optional
     // newDoc is the newly inserted document, including its _id
     // newDoc has no key called notToBeSaved since its value was undefined

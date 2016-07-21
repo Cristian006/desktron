@@ -59,3 +59,43 @@ footer{
 #note{
     margin-top: 10px;
 }
+
+.card .icon{
+    float: left;
+    margin-right: 1em;
+}
+
+.card img.icon{
+    height: 25px;
+}
+
+.card .content{
+    display: block;
+    overflow: hidden;
+}
+
+.card .content p{
+    margin: 0px;
+    padding: 0px;
+    font-size: 1.2em;
+}
+
+.card .card-title{
+    margin: 0px;
+    padding: 0px;
+    font-weight: bold;
+    height: 30px;
+    line-height: 30px;
+    font-size: 1.5em;
+    overflow: hidden;
+}
+
+img.title-icon{
+    height: 30px;
+    float:left;
+    margin-right: 10px;
+}
+
+.card .time, .card .place, .card .card-header, .card .dispatch, .card .screen, .card .note{
+    padding-bottom: 15px;
+}

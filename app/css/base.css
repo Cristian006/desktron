@@ -40,6 +40,7 @@ html{
 
 .toolbar {
     position: fixed;
+    z-index: 2;
     top: 0px;
     right: 0px;
     left: 0px;
@@ -63,6 +64,7 @@ html{
 
 .tabs{
     position: fixed;
+    z-index: 2;
     top: 50px;
     left: 0px;
     right: 0px;

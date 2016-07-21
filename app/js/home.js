@@ -6,6 +6,13 @@ const nedb = require('nedb');
 var db = new nedb({filename : __dirname + '/data/db.json', autoload: true});
 
 var USER = null;
+var footerPhoneCounter = null;
+
+let iPhoneSixScreens = {
+    sg : '661-00141',
+    g : '661-00142',
+    sl : '661-00143'
+}
 
 document.onreadystatechange = function () {
     if (document.readyState == "complete") {
@@ -15,12 +22,12 @@ document.onreadystatechange = function () {
 
 //WebPage Set Up
 function init() {
-    console.log("IN IT - HOME RENDERER PROCESS");
-    
+    findAllElements();
+    JsBarcode(".barcode").init();
     db.find({}, function (err, docs){
       console.log("FOUND DOC " + docs[0].userName);
       USER = docs[0];
-      setUpHome();
+      updateHome();
     });
 
     document.getElementById("minButton").addEventListener("click", function (e) {
@@ -44,17 +51,19 @@ function init() {
 
     document.getElementById("startRepair").addEventListener("click", function(e){
         if(document.getElementById("phoneDispatch").value != ''){
-            repairPhone(document.getElementById("phoneDispatch").value);
+            startRepair(document.getElementById("phoneDispatch").value);
         }
     });
 };
 
-function setUpHome(){
-    console.log("Setting up " + USER);
-    document.getElementById("WelcomeCardTitle").innerHTML = "<img src=\"images/svgs/face_black.svg\"> Welcome, " + USER.userName;
-    document.getElementById("clockTime").innerHTML = "<h4>Clocked In: " + USER.clockedInTime + "</h4><h3>That is " + getTimeSinceClockedIn() +" ago.</h3>";
-    document.getElementById("footerPhone").innerHTML = getNumberOfPhones();
+function findAllElements(){
+    footerPhoneCounter = document.getElementById("footerPhone");
+}
+
+function updateHome(){
     document.getElementById("footerName").innerHTML = USER.userName;
+    updateWelcome();
+    updateFooterPhoneCount();
 }
 
 function openTabPage(evt, contentID){
@@ -78,6 +87,7 @@ function openTabPage(evt, contentID){
         case "home":
             toolBarTitle.innerHTML = "Home";
             changePageColor("#3F51B5", "#8C9EFF");
+            updateHome();
             break;
         case "repair":
             toolBarTitle.innerHTML = "Repair Technician";
@@ -112,11 +122,23 @@ function changePageColor(primary, secondary) {
     footer.style.backgroundColor = primary;
 }
 
+//--------------------------UI METHODS------------------------------------//
+function updateFooterPhoneCount(){
+    footerPhoneCounter.innerHTML = getNumberOfPhones();
+}
+
+function updateWelcome(){
+    document.getElementById("WelcomeCardTitle").innerHTML = "<img src=\"images/svgs/face_black.svg\"> Welcome, " + USER.userName;
+    document.getElementById("clockTime").innerHTML = "<h4>Clocked In: " + USER.clockedInTime + "</h4><h5>That is " + getTimeSinceClockedIn() +" ago.</h5>";
+}
+//--------------------------END-----------------------------------//
+
+
 //--------------------REPAIR---------------------------------------//
-function repairPhone(dis){
+function startRepair(dis){
     var phone = {
         dispatch : dis,
-        serial : 1232342342,
+        serial : 0,
         startTime : new Date(),
         endTime : null,
         note : '',
@@ -133,10 +155,12 @@ function repairPhone(dis){
         console.log("FOUND DOC " + docs[0].userName + "WITH " + docs[0].phones.length + " PHONES");
         USER = docs[0];
     });
+    
+    ipcRenderer.send('startRepair', USER.userName, dis);
 }
-//----------------------------------------------------------------//
+//-----------------------END--------------------------------------//
 
-
+//-------------------USER METHODS---------------------------------//
 function getNumberOfPhones(){
     return USER.phones.length;
 }
@@ -152,17 +176,31 @@ function getEfficiency() {
 function getTimeSinceClockedIn(){
     return timeConversion(new Date() - USER.clockedInTime);
 }
+//-----------------------END-------------------------------------//
 
+//--------------------PHONE METHODS-----------------------------//
+function getDispatch(index){
+    return USER.phones[index].dispatch;
+}
+  
+function getTimeStarted(index){
+    return USER.phones[index].startTime;
+}
+
+function repaired(index){
+    USER.phones[index].endTime = new Date();
+}
+
+function getTotalTime(){
+    return (USER.phones[index].startTime - USER.phones[index].endTime);
+}
+//----------------------END-------------------------------------//
 
 function timeConversion(millisec) {
     var seconds = (millisec / 1000).toFixed(1);
-
     var minutes = (millisec / (1000 * 60)).toFixed(1);
-
     var hours = (millisec / (1000 * 60 * 60)).toFixed(1);
-
     var days = (millisec / (1000 * 60 * 60 * 24)).toFixed(1);
-
     if (seconds < 60) {
         return seconds + " Sec";
     } else if (minutes < 60) {
