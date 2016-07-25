@@ -132,52 +132,47 @@ ipcMain.on('GSX-Login-Message', (event, name, pass) => {
 ipcMain.on('GSX-Pin-Message', (event, pinNumbers) => {
   mainDriver.findElements(By.className("digit-input")).then(elements => sendInPin(elements, pinNumbers));
 });
-
 ipcMain.on('startRepair', (event, username, phoneDispatch) => {
   var searchBar;
   console.log("STARTING REPAIR " + phoneDispatch + " -----------------------------");
-  if(mainDriver.isElementPresent(By.id("global_search"))){
-    console.log("global_search is in the current page");
-      searchBar = mainDriver.findElement(By.id("global_search"));
-      console.log("is searchBar present " + searchBar == null + "This is searchBar " + searchBar);
-      searchBar.sendKeys(phoneDispatch);
-      searchBar.sendKeys(webdriver.Key.RETURN);
-  }
-  else if(mainDriver.isElementPresent(By.id("global_search"))){
-      searchBar = mainDriver.findElement(By.id("global_search"));
-      searchBar.sendKeys(phoneDispatch);
-      searchBar.sendKeys(webdriver.Key.RETURN);
-  }
-  else{
-    mainDriver.get('https://gsx.apple.com/');
-    mainDriver.wait(function () {
-        if(mainDriver.isElementPresent(By.id("search_GSX_input"))){
-          searchBar = mainDriver.findElement(By.id("search_GSX_input"));
-          searchBar.sendKeys(phoneDispatch);
-          searchBar.submit();
-        }
-    }, 3000);
-  }
-  /*mainDriver.wait(function () {
-    getPhoneInfo();
-  }, 3000)*/
+  mainDriver.get("https://gsxapp.apple.com/WebApp/home.htm");
+  mainDriver.sleep(1000);    	
+  searchBar = getSearchBar();
+  searchBar.sendKeys(phoneDispatch);
+  searchBar.sendKeys(webdriver.Key.RETURN);
+
+  mainDriver.sleep(4000);
+  
+  getPhoneInfo();
 });
+
+function getSearchBar(){
+  return mainDriver.findElement(By.id("search_GSX_input"));
+}
 
 //TODO: when logging in check to see if we can find a doc with their user name already in the database
 //if so use that one if not create a new one. so we can close the program re open it and it would save everything for the day
 
 //send in pin number to modal dialog to login
 function getPhoneInfo() {
-  var phoneModel; 
-  mainDriver.findElements(By.className("swappable-text model")).then(modelText => phoneModel = getPhoneModel(modelText[0]));
-  console.log("PHONE MoDEL " + phoneModel);
+  var phoneModel = mainDriver.findElement(By.css("h3.swappable-text.model"));
+  
+  phoneModel.getInnerHtml().then(function(html){
+    console.log(html);
+  });
+  /*.then(modelText => function(){
+    phoneModel = getPhoneModel(modelText[0])
+    phoneModel.getText().then(text => console.log(text));
+  });*/
 }
 
 function getPhoneModel(div) {
   var p;
-  div.getText().then(text => p = text);
-  console.log("THE MODEL OF THIS PHONE IS" + p);
-  return p;
+  div.getText().then(text => function(text){
+    p = text
+    console.log("THE MODEL OF THIS PHONE IS" + p);
+    return p;
+  });
 }
 
 
