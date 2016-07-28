@@ -17,7 +17,7 @@ const moment = require('moment');
 
 const nedb = require('nedb');
 var db = new nedb({filename : __dirname + '/app/data/db.json', autoload: true});
-
+var phoneDB  = require('./app/data/phones.json');
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -143,7 +143,7 @@ ipcMain.on('startRepair', (event, username, phoneDispatch) => {
 
   mainDriver.sleep(4000);
   
-  getPhoneInfo();
+  getPhoneInfo(phoneDispatch);
 });
 
 function getSearchBar(){
@@ -154,48 +154,128 @@ function getSearchBar(){
 //if so use that one if not create a new one. so we can close the program re open it and it would save everything for the day
 
 //send in pin number to modal dialog to login
-function getPhoneInfo() {
+//get dispatch as a string
+function getPhoneInfo(dispatch) {
+  var dispatchRE = new RegExp("[Rr]")
   var phoneModel = mainDriver.findElement(By.css("h3.swappable-text.model"));
+  var phoneSerial = mainDriver.findElement(By.css("p#tester"));
+  var shipToAddress = mainDriver.findElement(By.css("div#shipToAddress.box_slot div.slot_details"))
+  var color = mainDriver.findElement(By.css((dispatchRE.test(dispatch) ? "div.box_slot p#tester + p" : "div.box_slot p#carrier_meid + p")));
+
+  var phone = {
+    MODEL : '',
+    DISPATCH : 0,
+    SERIAL : 0,
+    PLACE : '',
+    ADDRESS : '',
+    COLOR : '',
+    NOTE : '',
+    SCREEN : {
+      PN : '',
+      SN : '',
+      RN : ''      
+    },
+    STARTED : null,
+    ENDED : null,
+    TOTAL : null
+  }
+
+  phone.DISPATCH = dispatch;
   
   phoneModel.getInnerHtml().then(function(html){
-    console.log(html);
+    phone.MODEL = html;
+    console.log("MODEL: " + phone.MODEL);
   });
-  /*.then(modelText => function(){
-    phoneModel = getPhoneModel(modelText[0])
-    phoneModel.getText().then(text => console.log(text));
-  });*/
-}
 
-function getPhoneModel(div) {
-  var p;
-  div.getText().then(text => function(text){
-    p = text
-    console.log("THE MODEL OF THIS PHONE IS" + p);
-    return p;
+  phoneSerial.getInnerHtml().then(function(html){
+    html = html.replace(/<strong>([A-Za-z])\w+[\s#]+<[/]strong>/g, '');
+    phone.SERIAL = html;
+    console.log("DISPATCH: " + phone.DISPATCH);
+    console.log("SERIAL: " + phone.SERIAL);
   });
-}
 
+  shipToAddress.getInnerHtml().then(function(html){
+    var addressString = html.match(/\d+[ ](?:[A-Za-z0-9.-]+[ ]?)+(?:|Avenue|Lane|Road|Boulevard|Drive|Street|AVE|Dr|Rd|Blvd|Ln|St)\.?/);
+    phone.ADDRESS = (addressString.length > 0 ? addressString[0] : "No Address Found");
+    
+    if(addressString.length > 0){
+      switch(phone.ADDRESS){
+        case "340 University Avenue": 
+          phone.PLACE = "APPLE STORE PALO ALTO";
+          break;
+        case "183 Stanford Shopping Center":
+          phone.PLACE = "APPLE STORE STANFORD";
+          break;
+        case  "2421 BROADWAY ST":
+          phone.PLACE = "MOBILE KANGAROO REDWOOD CITY"
+          break;
+        case "100 W EL CAMINO REAL":
+          phone.PLACE = "MOBILE KANGAROO MOUNTAIN VIEW";
+        case "52 N SANTA CRUZ AVE":
+          phone.PLACE = "CLICKAWAY LOS GATOS"
+          break;
+        default:
+          phone.PLACE = "WE DON'T HAVE THIS ADDRESS ON RECORD, GET IT";
+          break;
+      }
+      console.log("SHIP TO: " + phone.PLACE + "\n     " + phone.ADDRESS);
+    }
+  });
+
+  color.getInnerHtml().then(function(html){
+    var gray = new RegExp("GRAY");
+    var gold = new RegExp("GOLD");
+    var silver = new RegExp("SILVER|SLVR");
+    var white = new RegExp("WHT");
+    var black = new RegExp("BLACK");
+    
+    if(gray.test(html)){
+      phone.COLOR = "SPACE GRAY";
+    }
+    else if(gold.test(html)){
+      phone.COLOR = "GOLD";
+    }
+    else if(silver.test(html)){
+      phone.COLOR = "SILVER";
+    }
+    else if(white.test(html)){
+      phone.COLOR = "WHITE";
+    }
+    else if(black.test(html)){
+      phone.COLOR = "BLACK";
+    }
+    else{
+      console.log("COLOR: WE HAVEN'T RECORDED THIS COLOR, GET IT " + html);
+    }
+    console.log(phone.COLOR);
+
+    phone.SCREEN.PN = getScreenPartNumber(phone.MODEL, phone.COLOR);
+  });
+
+  console.log(phone);
+}
 
 function sendInPin(elements, numbers){
   var i;
+  
   for (i=0; i < elements.length; i++){
     elements[i].sendKeys(numbers[i]);
     if(i==(elements.length-1)){
       mainDriver.findElement(By.name('setupLink')).click();
     }
   }
-
+  
   var newUser = {
     userName : user,
     clockedInTime : new Date(),
     clockedOutTime : null,
     phones : []
   }
-
+  
   db.remove({}, { multi: true }, function (err, numRemoved) {
     console.log("REMOVED " + numRemoved);
   });
-
+  
   db.insert(newUser, function (err, newDoc) {   
     // Callback is optional
     // newDoc is the newly inserted document, including its _id
@@ -221,6 +301,61 @@ function checkForClosingPopUp(){
   if(loggedIn){
     //check for logout pop up
     //if(mainDriver.findElement(By.id()));  
+  }
+}
+
+function getScreenPartNumber(model, color){
+  switch(model){
+    case "IPHONE 6":
+        switch(color){
+          case "SPACE GRAY":
+            return phoneDB.IPhone6.SGRY.screen;
+          case "SILVER":
+            return phoneDB.IPhone6.SLVR.screen;
+          case "GOLD":
+            return phoneDB.IPhone6.GLD.screen;
+          default:
+            return "";
+        }
+    case "IPHONE 6 PLUS":
+      switch(color){
+          case "SPACE GRAY":
+            return "661-00159";
+          case "SILVER":
+            return "661-00160";
+          case "GOLD":
+            return "661-00161";
+          default:
+            return "";
+        }
+    case "IPHONE 6S":
+      switch(color){
+          case "SPACE GRAY":
+            return "661-03053";
+          case "SILVER":
+            return "661-03054";
+          case "GOLD":
+            return "661-03055";
+          case "ROSE GOLD":
+            return "661-03056";
+          default:
+            return "";
+        }
+    case "IPHONE 6S PLUS":
+      switch(color){
+          case "SPACE GRAY":
+            return "661-02900";
+          case "SILVER":
+            return "661-02901";
+          case "GOLD":
+            return "661-02902";
+          case "ROSE GOLD":
+            return "661-02903";
+          default:
+            return "";
+        }
+    default:
+      return "";
   }
 }
 

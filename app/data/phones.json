@@ -1,0 +1,52 @@
+{
+  "IPhone6": {
+    "SGRY": {
+      "screen": "661-00141"
+    },
+    "SLVR": {
+      "screen": "661-00142"
+    },
+    "GLD": {
+      "screen": "661-00143"
+    }
+  },
+  "IPhone6Plus": {
+    "SGRY": {
+      "screen": "661-00159"
+    },
+    "SLVR": {
+      "screen": "661-00160"
+    },
+    "GLD": {
+      "screen": "661-00161"
+    }
+  },
+  "IPhone6s": {
+    "SGRY": {
+      "screen": "661-03053"
+    },
+    "SLVR": {
+      "screen": "661-03054"
+    },
+    "GLD": {
+      "screen": "661-03055"
+    },
+    "RGLD": {
+      "screen": "661-03056"
+    }
+  },
+  "IPhone6sPlus": {
+    "SGRY": {
+      "screen": "661-02900"
+    },
+    "SLVR": {
+      "screen": "661-02901"
+    },
+    "GLD": {
+      "screen": "661-02902"
+    },
+    "RGLD": {
+      "screen": "661-02903"
+    }
+  }
+}
