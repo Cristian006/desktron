@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "electron-json-storage": "^2.0.0",
-    "moment": "^2.14.1",
+    "jsface": "^2.4.9",
     "nedb": "^1.8.0"
   }
 }

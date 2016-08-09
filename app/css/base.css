@@ -75,6 +75,7 @@ html{
 }
 
 .navbar{
+    display: none;
     width: 50px;
     position: fixed;
     top: 0px;

@@ -1,27 +1,199 @@
-
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="css/base.css">
-    <link href='https://fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="css/spinner.css">
     <link rel="stylesheet" type="text/css" href="css/index.css">
+    <link href='https://fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css'>
+    <script src="js/JsBarcode.all.min.js"></script>
   </head>
   <body>
-    <div class="toolbar">
-      <div class="title">Apple MDR</div>
+    <nav id="mainNavBar" class="navbar">
+      <ul class="navbar-items">
+        <li class="nav-item" role="presentation">
+          <a href="#" class="nav-icon home active" role="button" onclick="openTabPage(event, 'home')"></a>
+        </li>
+        <li class="nav-item" role="presentation">
+          <a href="#" class="nav-icon rt" role="button" onclick="openTabPage(event, 'repair')"></a>
+        </li>
+        <li class="nav-item" role="presentation"">
+          <a href="#" class="nav-icon qa" role="button" onclick="openTabPage(event, 'quality')"></a>
+        </li>
+        <li class="nav-item" role="presentation">
+          <a href="#" class="nav-icon settings" role="button" onclick="openTabPage(event, 'settings')"></a>
+        </li>
+      </ul>
+    </nav>
+    <div id="mainToolBar" class="toolbar">
+      <div id="toolBarTitle" class="title">Apple MDR</div>
       <div class="windowButtons">
-        <div id="closeButton" onclick="">X</div>
-        <div id="maxButton" onclick="">&#x2610;</div>
-        <div id="minButton" onclick="">_</div>
+        <div id="closeButton">X</div>
+        <div id="maxButton">&#x2610;</div>
+        <div id="minButton" onclick="min">_</div>
       </div>
     </div>
-    <div class="tabs">
-      <div class="title">IQor Technical Services</div>
+    <div id="mainTabBar" class="tabs">
+      <div id="tabBarTitle" class="title">IQor Technical Services</div>
     </div>
-    <div class="container">
-      <div id="myModal" class="modal">
+    <div id="mainContainer" class="container">
+      <!-- HOME --------------------------------------------------------------------->
+      <div id="home" class="tab-content" style="display: none;">
+        <div id="intro-card" class="card">
+          <img src="images/iqorLogo.jpg">
+          We are using node <script>document.write(process.versions.node)</script>,
+          Chrome <script>document.write(process.versions.chrome)</script>,
+          and Electron <script>document.write(process.versions.electron)</script>.
+        </div>
+        <div class="card">
+          <h1 id="WelcomeCardTitle"><img src="images/svgs/face_black.svg"> Welcome, </h1>
+          <section id="clockTime"></section>
+        </div>
+        <div class="card">
+          <h1><img src="images/svgs/build/build_black.svg"> Repair Tech</h1>
+          <p>Click on the <img height="12px;" src="images/svgs/build/build_black.svg"> button 
+          in the navigation bar on the left</p>
+          <p>Once you scan the phone's <b>Dispatch Number</b> and click <b>Start Repair</b>, 
+          the timer for the tech's efficiency will start</p>
+          <p>repair the phone and when done, fill in the options provided and click 
+          <b>End Repair</b> to complete the GSX process for the basic process</p>
+          <p>Your efficency score for that phone will be saved and the program will complete
+          GSX with the options provided</p>
+        </div>
+        <div class="card">
+          <h1><img src="images/svgs/computer/computer_black.svg"> Quality Assurance</h1>
+          <p>Click on the <img height="12px" src="images/svgs/computer/computer_black.svg"> button 
+          in the navigation bar on the left</p>
+          <p>For now the <b>QA</b> tab will be more informational than anything</p>
+        </div>
+      </div>
+      <!-- REPAIR TECH --------------------------------------------------------------->
+      <div id="repair" class="tab-content" style="display:none;">
+        <div class="card">
+          <section class="card-header">
+            <img class="title-icon" src="images/svgs/build/build_black.svg"> 
+            <p class="card-title">Repair Phone</p>
+          </section>
+          <input class="card-input" id="phoneDispatch" type="text" placeholder="IPhone GSX Number">
+          <button id="startRepair">Start Repair</button>
+        </div>
+        <div id="PhoneToBeFixed" style="display: none;" class="card">
+          <!--section class="card-header">
+            <img class="title-icon" src="images/svgs/iphone/iphone_rose.svg"> 
+            <p class="card-title">Iphone 6S Rose Gold</p>
+          </section>
+          <section class="dispatch">
+              <img class="icon" src="images/svgs/receipt_black.svg">
+              <div class="content">
+                <p>Dispatch Number</p>
+                <svg class="barcode"
+                  jsbarcode-format="CODE39"
+                  jsbarcode-value="123456789012"
+                  jsbarcode-textmargin="0"
+                  jsbarcode-height="30px"
+                  jsbarcode-width="1"
+                  jsbarcode-fontOptions="bold"
+                  jsbarcode-font="Roboto Condensed">
+                </svg>
+                <p>Serial Number</p> 
+                <svg class="barcode"
+                  jsbarcode-format="CODE39"
+                  jsbarcode-value="L14HJU45Y3298UHF"
+                  jsbarcode-textmargin="0"
+                  jsbarcode-height="30px"
+                  jsbarcode-width="1"
+                  jsbarcode-fontOptions="bold"
+                  jsbarcode-font="Roboto Condensed">
+              </div>
+          </section>
+          <section class="place">
+              <img class="icon" src="images/svgs/place_black.svg">
+              <div class="content">
+                <p>Palo Alto</p>
+              </div>
+          </section>
+          <section class="time">
+              <img class="icon" src="images/svgs/timer/timer_black.svg">
+              <div class="content">
+                <p>Repair Started: 1:50.9PM</p>
+                <p>Repair Ended: 5:30.5PM</p>
+                <p>Repair Time: 3'40''</p>
+              </div>
+          </section>
+          <section class="note">
+              <img class="icon" src="images/svgs/note/note_black.svg">
+              <div class="content">
+                <p>No Note</p>
+              </div>
+          </section>
+          <section class="screen">
+              <img class="icon" src="images/svgs/smartphone_black.svg">
+              <div class="content">
+                <p>Part Number</p>
+                <svg class="barcode"
+                  jsbarcode-format="CODE39"
+                  jsbarcode-value="661-00141"
+                  jsbarcode-textmargin="0"
+                  jsbarcode-height="30px"
+                  jsbarcode-width="1"
+                  jsbarcode-fontOptions="bold"
+                  jsbarcode-font="Roboto Condensed">
+                </svg>
+                <p>Serial Number</p> 
+                <svg class="barcode"
+                  jsbarcode-format="CODE39"
+                  jsbarcode-value="L14HJU45Y3298UHF"
+                  jsbarcode-textmargin="0"
+                  jsbarcode-height="30px"
+                  jsbarcode-width="1"
+                  jsbarcode-fontOptions="bold"
+                  jsbarcode-font="Roboto Condensed">
+                <p>Return Order Number</p> 
+                <svg class="barcode"
+                  jsbarcode-format="CODE39"
+                  jsbarcode-value="DSFJHWTYWIUEOFHIH29"
+                  jsbarcode-textmargin="0"
+                  jsbarcode-height="30px"
+                  jsbarcode-width="1"
+                  jsbarcode-fontOptions="bold"
+                  jsbarcode-font="Roboto Condensed">
+              </div>
+          </section>
+          <section class="screws">
+              <img class="icon" src="images/svgs/screwdriver_black.svg">
+              <div class="content">
+                <p>661-00141</p>
+                <p>661-00141</p>
+                <p>661-00141</p>
+                <p>661-00141</p>
+                <p>661-00141</p>
+              </div>
+          </section-->
+        </div>
+        <!--div class="card">
+          <h2><img height="20px" src="images/svgs/iphone/iphone_rose.svg"> Iphone 6S RG - R10021032</h2>
+          <section id="note"><img style="vertical-align:top" src="images/svgs/note/note_black.svg"> <textarea placeholder="Note"></textarea></section>         
+          <button id="startRepair">End Repair</button>
+        </div-->
+        <div class="timer-card">
+          <img style="vertical-align: middle" src="images/svgs/timer/timer_white.svg">
+          <span>00:00:00</span>
+        </div>
+      </div>
+      <!-- QUALITY ASSURANCE ---------------------------------------------------------->
+      <div id="quality" class="tab-content" style="display:none;">
+        <div class="card">
+          <h1><img src="images/svgs/iphone/iphone_black.svg">QA</h1>
+        </div>
+      </div>
+      <!-- SETTINGS ------------------------------------------------------------------->
+      <div id="settings" class="tab-content" style="display:none;">
+        <div class="card">
+          <h1><img src="images/svgs/iphone/iphone_black.svg">Settings</h1>
+        </div>
+      </div>
+      <!-- LOGIN ---------------------------------------------------------------------->
+      <div id="login" class="tab-content">
+        <div id="myModal" class="modal">
           <div class="card modal-content">
             <h2>Verification</h2>
             <h4>Enter the 4 digit verification code sent to your phone.</h4>
@@ -38,49 +210,65 @@
                     }
                   </script>
               </div>
-            <button id="pinButton">Continue</button>
+              <button id="pinButton">Continue</button>
           </div>
+        </div>
+        <div class="card">
+          <section>
+            <img src="images/iqorLogo.jpg">
+          </section>
+          <section style="width=100%;">
+            <svg id="loadingSpinner" style="display:none; margin: 0 auto; width: 100px;" version="1.1" id="L3" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+              viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
+            <circle fill="none" stroke="#303030" stroke-width="4" cx="50" cy="50" r="44" style="opacity:0.5;"/>
+              <circle fill="#e74c3c" stroke="#e74c3c" stroke-width="3" cx="8" cy="54" r="6" >
+                <animateTransform
+                  attributeName="transform"
+                  dur="2s"
+                  type="rotate"
+                  from="0 50 48"
+                  to="360 50 52"
+                  repeatCount="indefinite" />
+              </circle>
+            </svg>
+          </section>
+          <section id="loginSection">
+              <input class="card-input" placeholder="Apple ID" type="text" id="user-name">
+              <input class="card-input" placeholder="Password" type="password" id="user-password">
+              <button id="loginButton">Log In</button>
+          </section>
+          <section style="text-align: center;">
+            <p>For use with Apple's GSX System</p>
+            We are using node <script>document.write(process.versions.node)</script>,
+            Chrome <script>document.write(process.versions.chrome)</script>,
+            and Electron <script>document.write(process.versions.electron)</script>.
+            <!-- follow me template -->
+            <div class="made-with-love">
+              Made with 
+              <i>♥</i> by 
+              <a target="_blank" href="#">Cristian Ponce</a>
+            </div>
+          </section>
+        </div>
       </div>
-      <div class="card">
-        <section>
-          <img src="images/iqorLogo.jpg">
-        </section>
-        <section style="width=100%;">
-          <svg id="loadingSpinner" style="display:none; margin: 0 auto;" version="1.1" id="L3" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-            viewBox="0 0 100 100" enable-background="new 0 0 0 0" xml:space="preserve">
-          <circle fill="none" stroke="#303030" stroke-width="4" cx="50" cy="50" r="44" style="opacity:0.5;"/>
-            <circle fill="#e74c3c" stroke="#e74c3c" stroke-width="3" cx="8" cy="54" r="6" >
-              <animateTransform
-                attributeName="transform"
-                dur="2s"
-                type="rotate"
-                from="0 50 48"
-                to="360 50 52"
-                repeatCount="indefinite" />
-            </circle>
-          </svg>
-        </section>
-        <section id="loginSection">
-            <input class="loginInput" placeholder="Apple ID" type="text" id="user-name">
-            <input class="loginInput" placeholder="Password" type="password" id="user-password">
-            <button id="loginButton">Log In</button>
-        </section>
-        <section class="bottomSection">
-          <p>For use with Apple's GSX System</p>
-          We are using node <script>document.write(process.versions.node)</script>,
-          Chrome <script>document.write(process.versions.chrome)</script>,
-          and Electron <script>document.write(process.versions.electron)</script>.
-          <!-- follow me template -->
-          <div class="made-with-love">
-            Made with 
-            <i>♥</i> by 
-            <a target="_blank" href="#">Cristian Ponce</a>
-          </div>
-        </section>
-      </div>  
     </div>
+    <footer id="mainFooter" class="clearfix" style="display: none;">
+      <ul>
+        <li class="left">
+          <img style="float: left;" src="images/svgs/iphone/iphone_white.svg">
+          <p id="footerPhone" style="float: left;">40</p>
+        </li>
+        <li class="left">
+          <img style="float: left;" src="images/svgs/face_white.svg">
+          <p id="footerName" style="float: left; margin-left: 5px;">Cristian Ponce</p>
+        </li>
+        <li class="right">
+          <a href="index.html" role="button">Log Out</a>
+        </li>
+      </ul>
+    </footer>
   </body>
-  <script>
-    require('./js/renderer.js');
+  <script src="./js/index.js">
+    //require('./js/index.js');
   </script>
 </html>

@@ -11,8 +11,9 @@ document.onreadystatechange = function () {
     }
 };
 
-ipcRenderer.on('GSX-Login-Reply', (event, arg) => {
-    console.log(arg); // prints user name
+//OPEN PIN MODAL
+ipcRenderer.on('GSX-Login-Reply', (event, user) => {
+    console.log(user); // prints user name
     openPinModal();
 });
 

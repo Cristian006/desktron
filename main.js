@@ -8,16 +8,15 @@ const {Menu} = electron;
 //Module to receive calls from the renderer process
 const {ipcMain} = electron;//require('electron');
 // App Icon
-const appFavIcon = "app/images/lightbulb/lightbulb.png"
+const appFavIcon = "app/images/lightbulb/lightbulb.png";
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win;
+var phoneModels = ["[Ii]Phone 6$", "[Ii]Phone 6 Plus$", "[Ii]Phone 6S$", "[Ii]Phone6S Plus$"];
+var phoneColors = ["SPACE GRAY", "SILVER", "GOLD", "ROSE GOLD"];
+var screenPartNumbers = ["661-00141","661-00142","661-00143","661-00159","661-00160","661-00161","661-03053","661-03054","661-03055","661-03056","661-02900","661-02901","661-02902","661-02903"];
+var screwPartNumbers = ["661-00135, 661-00136, 661-00137", "661-00235, 661-00236, 661-00237", "661-00335, 661-00336, 661-00337", "661-00435, 661-00436, 661-00437"];
 
-const moment = require('moment');
-
-const nedb = require('nedb');
-var db = new nedb({filename : __dirname + '/app/data/db.json', autoload: true});
-var phoneDB  = require('./app/data/phones.json');
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -25,11 +24,11 @@ app.on('ready', createWindow);
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
-  // On OS X it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+    // On OS X it is common for applications and their menu bar
+    // to stay active until the user quits explicitly with Cmd + Q
+    if (process.platform !== 'darwin') {
+        app.quit();
+    }
 });
 
 app.on('activate', () => {
@@ -68,83 +67,42 @@ function createWindow() {
   });
 }
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
-const webdriver = require('selenium-webdriver'),
-    By = require('selenium-webdriver').By,
-    until = require('selenium-webdriver').until;
-const chrome = require('selenium-webdriver/chrome');
-const path = require('chromedriver').path;
-const service = new chrome.ServiceBuilder(path).build();
-
-var mainDriver = null;
-var loggedIn = false;
-var user = '';
-
-chrome.setDefaultService(service);
-
-//GSX LOGIN
-ipcMain.on('GSX-Login-Message', (event, name, pass) => {
-  console.log("logging in the main process");
-  mainDriver = new webdriver.Builder().withCapabilities(webdriver.Capabilities.chrome()).build();
-  mainDriver.get('https://gsx.apple.com/');
-  var re = /@(iqor)*\.(com)|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})(:[0-9]{1,5})?$/;
-  if (name.search(re) == -1)
-  {
-    user = name.replace(".", " ");
-    name += "@iqor.com";
-  }
-  else{
-    user = name.replace(".", " ");
-    user = user.replace("@iqor.com", "");
-  }
-  user = TitleCase(user);
-
-  mainDriver.getTitle().then(function(title) {
-    console.log(title);
-    if(title.includes("Login")){
-        //USERNAME
-        var inputElementForUserID = mainDriver.findElement(By.name('appleId'));
-        inputElementForUserID.sendKeys(name);
-        //PASSWORD
-        var inputElementForUserPass = mainDriver.findElement(By.name('accountPassword'));
-        inputElementForUserPass.sendKeys(pass);
-        inputElementForUserPass.submit();
-    }
-  });
-
-  mainDriver.getTitle().then(function(title) {
-    if(title.includes("My Apple ID")){
-      //we logged in
-      loggedIn = true;
-      mainDriver.findElement(By.id('send-code-to-trusted-device')).click();
-      mainDriver.findElement(By.name('rememberMeSelected')).click();
-      event.sender.send('GSX-Login-Reply', user);
-    }
-    else if (title.includes("Login")){
-      event.sender.send('GSX-Login-Reply', 'false');
-      console.log("WE DID NOT LOG IN" + title);
-    }
-  });
+ipcMain.on('startRepair', (event, dispatch) => {
+  updateUSERFromDB();
+  startRepair(event, dispatch);
 });
 
-//Send pin numbers to the modal dialog on gsx
-ipcMain.on('GSX-Pin-Message', (event, pinNumbers) => {
-  mainDriver.findElements(By.className("digit-input")).then(elements => sendInPin(elements, pinNumbers));
-});
-ipcMain.on('startRepair', (event, username, phoneDispatch) => {
+function startRepair(event, dis){
   var searchBar;
-  console.log("STARTING REPAIR " + phoneDispatch + " -----------------------------");
+  console.log("STARTING REPAIR " + dis + " -----------------------------");
   mainDriver.get("https://gsxapp.apple.com/WebApp/home.htm");
   mainDriver.sleep(1000);    	
   searchBar = getSearchBar();
-  searchBar.sendKeys(phoneDispatch);
+  searchBar.sendKeys(dis);
   searchBar.sendKeys(webdriver.Key.RETURN);
 
   mainDriver.sleep(4000);
-  
-  getPhoneInfo(phoneDispatch);
-});
+
+  getPhoneInfo(event, dis);
+}
+
+function updateUSERFromDB(){
+    db.find({}, function (err, docs){
+        console.log("FOUND DOC IN UPDATE USER FORM DB: " + docs[0].name);
+        USER.name = docs[0].name;
+        USER.clockin = docs[0].clockin;
+        USER.clockout = docs[0].clockout;
+        USER.phones = docs[0].phones;
+        console.log("PHONES: " + USER.phones.length);
+    });
+}
+
+function updateUSERInDB(){
+    db.update({ name: USER.name }, USER, {}, function (err, numReplaced) {
+          console.log("UPDATED " + numReplaced + " USER(s).");
+    });
+}
+
 
 function getSearchBar(){
   return mainDriver.findElement(By.id("search_GSX_input"));
@@ -155,70 +113,53 @@ function getSearchBar(){
 
 //send in pin number to modal dialog to login
 //get dispatch as a string
-function getPhoneInfo(dispatch) {
+function getPhoneInfo(event, dispatch) {
   var dispatchRE = new RegExp("[Rr]")
   var phoneModel = mainDriver.findElement(By.css("h3.swappable-text.model"));
   var phoneSerial = mainDriver.findElement(By.css("p#tester"));
   var shipToAddress = mainDriver.findElement(By.css("div#shipToAddress.box_slot div.slot_details"))
   var color = mainDriver.findElement(By.css((dispatchRE.test(dispatch) ? "div.box_slot p#tester + p" : "div.box_slot p#carrier_meid + p")));
 
-  var phone = {
-    MODEL : '',
-    DISPATCH : 0,
-    SERIAL : 0,
-    PLACE : '',
-    ADDRESS : '',
-    COLOR : '',
-    NOTE : '',
-    SCREEN : {
-      PN : '',
-      SN : '',
-      RN : ''      
-    },
-    STARTED : null,
-    ENDED : null,
-    TOTAL : null
-  }
-
-  phone.DISPATCH = dispatch;
+  var phone = new Phone();
+  phone.dispatch = dispatch;
   
   phoneModel.getInnerHtml().then(function(html){
-    phone.MODEL = html;
-    console.log("MODEL: " + phone.MODEL);
+    phone.model = html;
+    console.log("model: " + phone.model);
   });
 
   phoneSerial.getInnerHtml().then(function(html){
     html = html.replace(/<strong>([A-Za-z])\w+[\s#]+<[/]strong>/g, '');
-    phone.SERIAL = html;
-    console.log("DISPATCH: " + phone.DISPATCH);
-    console.log("SERIAL: " + phone.SERIAL);
+    phone.serial = html;
+    console.log("DISPATCH: " + phone.dispatch);
+    console.log("SERIAL: " + phone.serial);
   });
 
   shipToAddress.getInnerHtml().then(function(html){
     var addressString = html.match(/\d+[ ](?:[A-Za-z0-9.-]+[ ]?)+(?:|Avenue|Lane|Road|Boulevard|Drive|Street|AVE|Dr|Rd|Blvd|Ln|St)\.?/);
-    phone.ADDRESS = (addressString.length > 0 ? addressString[0] : "No Address Found");
+    phone.address = (addressString.length > 0 ? addressString[0] : "No Address Found");
     
     if(addressString.length > 0){
-      switch(phone.ADDRESS){
+      switch(phone.address){
         case "340 University Avenue": 
-          phone.PLACE = "APPLE STORE PALO ALTO";
+          phone.place = "APPLE STORE PALO ALTO";
           break;
         case "183 Stanford Shopping Center":
-          phone.PLACE = "APPLE STORE STANFORD";
+          phone.place = "APPLE STORE STANFORD";
           break;
         case  "2421 BROADWAY ST":
-          phone.PLACE = "MOBILE KANGAROO REDWOOD CITY"
+          phone.place = "MOBILE KANGAROO REDWOOD CITY"
           break;
         case "100 W EL CAMINO REAL":
-          phone.PLACE = "MOBILE KANGAROO MOUNTAIN VIEW";
+          phone.place = "MOBILE KANGAROO MOUNTAIN VIEW";
         case "52 N SANTA CRUZ AVE":
-          phone.PLACE = "CLICKAWAY LOS GATOS"
+          phone.place = "CLICKAWAY LOS GATOS"
           break;
         default:
-          phone.PLACE = "WE DON'T HAVE THIS ADDRESS ON RECORD, GET IT";
+          phone.place = "WE DON'T HAVE THIS ADDRESS ON RECORD, GET IT";
           break;
       }
-      console.log("SHIP TO: " + phone.PLACE + "\n     " + phone.ADDRESS);
+      console.log("SHIP TO: " + phone.place + "\n     " + phone.address);
     }
   });
 
@@ -230,67 +171,35 @@ function getPhoneInfo(dispatch) {
     var black = new RegExp("BLACK");
     
     if(gray.test(html)){
-      phone.COLOR = "SPACE GRAY";
+      phone.color = "SPACE GRAY";
     }
     else if(gold.test(html)){
-      phone.COLOR = "GOLD";
+      phone.color = "GOLD";
     }
     else if(silver.test(html)){
-      phone.COLOR = "SILVER";
+      phone.color = "SILVER";
     }
     else if(white.test(html)){
-      phone.COLOR = "WHITE";
+      phone.color = "WHITE";
     }
     else if(black.test(html)){
-      phone.COLOR = "BLACK";
+      phone.color = "BLACK";
     }
     else{
       console.log("COLOR: WE HAVEN'T RECORDED THIS COLOR, GET IT " + html);
     }
-    console.log(phone.COLOR);
+    console.log("COLOR: " + phone.color);
 
-    phone.SCREEN.PN = getScreenPartNumber(phone.MODEL, phone.COLOR);
-  });
-
-  console.log(phone);
-}
-
-function sendInPin(elements, numbers){
-  var i;
-  
-  for (i=0; i < elements.length; i++){
-    elements[i].sendKeys(numbers[i]);
-    if(i==(elements.length-1)){
-      mainDriver.findElement(By.name('setupLink')).click();
-    }
-  }
-  
-  var newUser = {
-    userName : user,
-    clockedInTime : new Date(),
-    clockedOutTime : null,
-    phones : []
-  }
-  
-  db.remove({}, { multi: true }, function (err, numRemoved) {
-    console.log("REMOVED " + numRemoved);
-  });
-  
-  db.insert(newUser, function (err, newDoc) {   
-    // Callback is optional
-    // newDoc is the newly inserted document, including its _id
-    // newDoc has no key called notToBeSaved since its value was undefined
-    console.log("NEW DOC " + newDoc.userName + " " + newDoc.phones.length);
-  });
-
-  db.find({}, function (err, docs){
-      console.log("FOUND DOC " + docs[0].userName);
-  });
-  
-  // and load the index.html of the app.
-  win.loadURL(`file://${__dirname}/app/home.html`);
-  mainDriver.getTitle().then(function(title) {
-    console.log(title);
+    phone.screen.pn = getScreenPartNumber(phone.model, phone.color);
+    phone.screws = getScrewPartNumbers(phone.model);
+    console.log("screen pn#: " + phone.screen.pn);
+    console.log("screws pn#: " + phone.screws);
+    USER.phones.push(phone);
+    db.update({ name: USER.name }, USER, {}, function (err, numReplaced) {
+          console.log("UPDATED " + USER.name + " " + numReplaced + " USER(s).");
+          console.log("CALLING PHONE INFO");
+          event.sender.send('Phone-Info');
+    });
   });
 }
 
@@ -298,65 +207,39 @@ var checkForPopUpTimer = setInterval(checkForClosingPopUp, 180000);
 
 function checkForClosingPopUp(){
   console.log("CHECKING FOR POPUP");
-  if(loggedIn){
+  /*if(loggedIn){
     //check for logout pop up
     //if(mainDriver.findElement(By.id()));  
+  }*/
+}
+
+function getScrewPartNumbers(model){
+  var re, i;
+  for(i = 0; i < phoneModels.length; i++){
+    re = new RegExp(phoneModels[i]);
+    if(re.test(model)){
+      return screwPartNumbers[i];
+    }
   }
 }
 
-function getScreenPartNumber(model, color){
-  switch(model){
-    case "IPHONE 6":
-        switch(color){
-          case "SPACE GRAY":
-            return phoneDB.IPhone6.SGRY.screen;
-          case "SILVER":
-            return phoneDB.IPhone6.SLVR.screen;
-          case "GOLD":
-            return phoneDB.IPhone6.GLD.screen;
-          default:
-            return "";
+function getScreenPartNumber(model, color){  
+  var i, j, re;
+  for(i = 0; i < phoneModels.length; i++){
+    re = new RegExp(phoneModels[i]);
+    if(re.test(model)){
+      for(j = 0; j < phoneColors.length; j++){
+        re = new RegExp(phoneColors[j]);
+        if(re.test(color)){
+          return screenPartNumbers[getIndexForScreenPartNumber(i+1, j)];
         }
-    case "IPHONE 6 PLUS":
-      switch(color){
-          case "SPACE GRAY":
-            return "661-00159";
-          case "SILVER":
-            return "661-00160";
-          case "GOLD":
-            return "661-00161";
-          default:
-            return "";
-        }
-    case "IPHONE 6S":
-      switch(color){
-          case "SPACE GRAY":
-            return "661-03053";
-          case "SILVER":
-            return "661-03054";
-          case "GOLD":
-            return "661-03055";
-          case "ROSE GOLD":
-            return "661-03056";
-          default:
-            return "";
-        }
-    case "IPHONE 6S PLUS":
-      switch(color){
-          case "SPACE GRAY":
-            return "661-02900";
-          case "SILVER":
-            return "661-02901";
-          case "GOLD":
-            return "661-02902";
-          case "ROSE GOLD":
-            return "661-02903";
-          default:
-            return "";
-        }
-    default:
-      return "";
+      }
+    }
   }
+}
+
+function getIndexForScreenPartNumber(i, j){
+  return ((i==1) ? (i*j) : (i==2) ? ((i*j) + 1) : (i==3) ? ((i*2)+j) : ((i*2)+j+2));
 }
 
 function TitleCase(str){
